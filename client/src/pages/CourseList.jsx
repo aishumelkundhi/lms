@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './CourseList.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 function CourseList() {
   const [courses, setCourses] = useState([]);
@@ -19,7 +19,7 @@ function CourseList() {
     try {
       const response = await axios.get(`${API_URL}/courses`);
       setCourses(response.data.courses);
-    } catch {
+    } catch (err) {
       setError('Failed to load courses');
     } finally {
       setLoading(false);

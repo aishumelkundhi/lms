@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import './CourseDetail.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 function CourseDetail() {
   const { id } = useParams();
@@ -29,7 +29,7 @@ function CourseDetail() {
       const response = await axios.get(`${API_URL}/courses/${id}`);
       setCourse(response.data.course);
       setSections(response.data.sections);
-    } catch {
+    } catch (err) {
       setError('Failed to load course details');
     } finally {
       setLoading(false);

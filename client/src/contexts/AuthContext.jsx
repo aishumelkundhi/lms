@@ -3,7 +3,8 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-const API_URL = 'http://localhost:5000/api';
+// Use environment variable or default to localhost for development
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -24,7 +25,7 @@ export function AuthProvider({ children }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(response.data.user);
-    } catch {
+    } catch (error) {
       localStorage.removeItem('token');
     } finally {
       setLoading(false);
@@ -87,5 +88,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

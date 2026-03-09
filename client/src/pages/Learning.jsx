@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import './Learning.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 function Learning() {
   const { courseId, lessonId: urlLessonId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { getAuthHeaders } = useAuth();
   
   const [course, setCourse] = useState(null);
@@ -66,11 +67,7 @@ function Learning() {
   useEffect(() => {
     if (currentLesson && courseId) {
       fetchNavigation();
-      // Only mark as in_progress if not already completed
-      const currentStatus = getLessonStatus(currentLesson.id);
-      if (currentStatus !== 'completed') {
-        updateLessonProgress('in_progress');
-      }
+      updateLessonProgress('in_progress');
     }
   }, [currentLesson?.id]);
 
@@ -79,7 +76,7 @@ function Learning() {
       const response = await axios.get(`${API_URL}/courses/${courseId}`);
       setCourse(response.data.course);
       setSections(response.data.sections);
-    } catch {
+    } catch (err) {
       setError('Failed to load course');
     } finally {
       setLoading(false);
@@ -187,7 +184,7 @@ function Learning() {
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return '';
     // Handle various YouTube URL formats
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     if (match && match[2].length === 11) {
       return `https://www.youtube.com/embed/${match[2]}`;
@@ -247,7 +244,7 @@ function Learning() {
                 
                 {section.lessons && (
                   <ul className="sidebar-lessons">
-                    {section.lessons.map((lesson) => {
+                    {section.lessons.map((lesson, lessonIndex) => {
                       const status = getLessonStatus(lesson.id);
                       const isActive = currentLesson?.id === lesson.id;
                       

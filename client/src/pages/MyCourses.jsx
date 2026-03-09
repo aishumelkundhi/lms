@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import './MyCourses.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 function MyCourses() {
   const { getAuthHeaders } = useAuth();
@@ -22,7 +22,7 @@ function MyCourses() {
         headers: getAuthHeaders()
       });
       setCourses(response.data.courses);
-    } catch {
+    } catch (err) {
       setError('Failed to load your courses');
     } finally {
       setLoading(false);
